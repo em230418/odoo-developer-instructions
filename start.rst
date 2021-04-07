@@ -15,6 +15,39 @@
 Данный раздел не будет затрагивать процесс установки данной ОС.
 При возникновении вопросов по процессу установки, свяжитесь с ведущим разработчиком.
 
+О терминале
+===========
+
+Под терминалом можно назвать аналог интерпретатора командой строки в Windows (cmd.exe).
+В процессе работы он очень часто используется.
+
+Везде, где говорится "выполните эту команду", подразумевается открыть терминал и ввести туда указанную команду.
+
+Настройка путей и переменных окружения
+======================================
+
+Предполагается, что все для работы будет находиться в каталоге ``/opt``.
+
+Создаем каталог ``/opt`` и устанавливаем владельца этого каталога на текущего пользователя.
+
+.. code-block:: sh
+
+   sudo mkdir /opt
+   sudo chown $USER:$USER /opt
+
+Также создаем каталог ``/opt/bin`` в котором будут храняться исполняемые файлы или символические ссылки на исполняемые файлы.
+
+.. code-block:: sh
+
+   mkdir /opt/bin
+
+Этот каталог надо добавить в переменную окружения PATH. Для этого в файле ~/.bashrc в самом конце добавляем следующую строку:
+
+   export PATH=/opt/bin:$PATH
+
+И перезапустите терминал.
+
+
 Установка программ
 ==================
 
@@ -26,7 +59,7 @@
 4. Docker
 5. docker-compose
 
-Для установки первых трех в терминале выполните следующую команду:
+Для установки первых трех выполните следующую команду:
 
 .. code-block:: sh
 
@@ -43,9 +76,8 @@
 
 .. code-block:: sh
 
-     sudo curl -L "https://github.com/docker/compose/releases/download/1.28.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-     sudo chmod +x /usr/local/bin/docker-compose
-     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+     sudo curl -L "https://github.com/docker/compose/releases/download/1.28.6/docker-compose-$(uname -s)-$(uname -m)" -o /opt/bin/docker-compose
+     sudo chmod +x /opt/bin/docker-compose
 
 Для проверки работоспособности убедитесь, что следующая команда выведет версию
 
@@ -93,3 +125,40 @@
 .. code-block:: sh
 
    docker run hello-world
+
+Установка PyCharm
+-----------------
+
+Если какое-либо приложение требует установки в обход метода ``sudo apt-get install``, то практикуется установка в данный каталог.
+Среди подобных приложения является PyCharm.
+
+Переходим в данный каталог и уставливаем PyCharm:
+
+.. code-block:: sh
+
+   cd /opt
+   wget https://download-cf.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz -O pycharm-community.tar.gz
+   tar xvf pycharm-community.tar.gz
+   mv pycharm-community-2020.3.5 pycharm-ce
+   ln -s /opt/pycharm-ce/bin/pycharm.sh /opt/bin/pycharm
+
+
+Далее создаем символическую ссылку на рабочем столе (опционально):
+
+.. code-block:: sh
+
+   cd ~/Desktop
+   # каталог с рабочим столом может называться также "Рабочий стол"
+   # если команда выше не сработает, то выполните следующую команду
+   cd ~/Рабочий\ стол
+   ln -s /opt/bin/pycharm pycharm
+
+Установка шаблонизатора
+-----------------------
+
+TODO:
+
+Настройка виртуальных окружений
+===============================
+
+TODO: https://github.com/em230418/docker-odoo
