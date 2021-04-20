@@ -106,6 +106,48 @@
 Напомню, что слово vendor с английского переводится, как поставщик, а слово me - я.
 В данном конктесте подразумевается, в каталоге ``vendor/me`` будут храняться модули, у которых поставщиком являюсь я.
 
+Далее, чтобы Odoo подтянул каталоги с модулями, надо:
+
+1. в файле ``docker-compose.yml`` настроить соотвествие путей из основной системы в контейнер;
+
+2. в файле ``config/odoo.conf`` настроить пути до модулей в рамках контейнера;
+
+В ``docker-compose.yml`` добавляем путь следующим образом:
+
+.. code-block:: diff
+
+    diff --git a/docker-compose.yml b/docker-compose.yml
+    index 940d1fb..629ba25 100644
+    --- a/docker-compose.yml
+    +++ b/docker-compose.yml
+    @@ -9,6 +9,7 @@ x-default:
+         - ./vendor/odoo/odoo:/usr/lib/python3/dist-packages/odoo
+         - ./vendor/odoo/addons:/mnt/addons/odoo
+         - ./config:/etc/odoo
+    +    - ./vendor/me:/mnt/addons/private
+
+       environment:
+         - WDB_SOCKET_SERVER=wdb
+
+В ``config/odoo.conf`` добавляем путь следующим образом:
+
+.. code-block:: diff
+
+    diff --git a/config/odoo.conf b/config/odoo.conf
+    index b0bd3f1..dd72c46 100755
+    --- a/config/odoo.conf
+    +++ b/config/odoo.conf
+    @@ -1,5 +1,6 @@
+     [options]
+     addons_path =
+    +    /mnt/addons/private,
+         /mnt/addons/odoo
+
+     data_dir = /var/lib/odoo
+
+Написание модуля
+----------------
+
 Перейдем в этот каталог:
 
 .. code-block:: sh
