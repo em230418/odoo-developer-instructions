@@ -324,3 +324,120 @@
 После применения фильтра мы в списке увидим то самое действие, которое нам нужно:
 
 .. image:: images/window_actions_search.png
+
+Нажимаем на нее и попадаем в форму этого действия.
+У этой формы внизу есть раздел с таблицей Views.
+В этой таблице для пары "View Type - View" есть значения "Form - res.partner.form".
+Нажимаем на эту строку таблицы, далее во всплывшем окне нажимаем на "res.partner.form" и мы наконец-то попадаем на вьюху, которую нам надо редактировать.
+
+Редактирование вьюхи
+--------------------
+
+Вообще говоря вьюху можно прямо в этой форме.
+Но у того подхода есть сложность переноса изменений другому клиенту.
+Клиенту удобно скинуть модуль, который редактирует форму, как нужно.
+
+В самом модуле надо эти изменения описать.
+Вернемся в форму этой вьюхи и смотрим на значение "External ID", который равен ``base.view_partner_form``.
+Надо ее запомнить.
+
+Итак возвращаемся в наш модуль helloworld
+
+.. code-block:: sh
+
+   cd /opt/docker-odoo-14/vendor/me/helloworld
+
+и с помощью шаблонизатора создаем файл, в котором будем описывать изменения
+
+.. code-block:: sh
+
+   mb view
+
+На предложенные вопросы отвечаем так:
+
+- View name (underscored notation): res_partner_views
+
+После этого шаблонизатор:
+
+- создаст файл ``views/res_partner_views.xml``, в котором будем описывать изменения
+- в файл ``__manifest__.py`` в раздел ``data`` добавит пусть к файлу из пункта выше
+
+Откроем файл ``views/res_partner_views.xml`` и пишем следующее:
+
+.. code-block:: xml
+
+   <?xml version="1.0" encoding="UTF-8"?>
+   <odoo>
+       <record id="res_partner_form" model="ir.ui.view">
+           <field name="name">res.partner.form.helloworld</field>
+           <field name="model">res.partner</field>
+           <field name="inherit_id" ref="base.view_partner_form" />
+           <field name="arch" type="xml">
+               <xpath expr="//field[@name='website']" position="after">
+                   <field name="vk_url" widget="url" />
+               </xpath>
+           </field>
+       </record>
+   </odoo>
+
+Пояснения по каждой строке элемента ``record``.
+
+.. code-block:: xml
+
+   <record id="res_partner_form" model="ir.ui.view">
+
+Создается запись модели ``ir.ui.view`` (т.е. вьюха).
+В свойстве ``id`` указан ``res_partner_form``, соотвественно внешний идентификатор этой записи будет ``helloworld.res_partner_form``.
+Свойству ``id`` можно задать другое непустое значение, но главное чтобы в рамках модуля ``helloworld`` не было других записей с таким-же значением ``id``.
+
+.. code-block:: xml
+
+   <field name="name">res.partner.form.helloworld</field>
+
+Тут задается имя этой вьюхи.
+По сути взяли старое имя ``res.partner.form`` и приписали в конце ``.helloworld``.
+Можнл задать другое непустое значение.
+
+.. code-block:: xml
+
+   <field name="model">res.partner</field>
+
+Тут задается модель, к которой эта вьюха применяется
+
+.. code-block:: xml
+
+   <field name="inherit_id" ref="base.view_partner_form" />
+
+Тут задается, какую вьюху поправляем.
+Обращаем внимание на значение ``base.view_partner_form``.
+Это внешний идентификатор вьюхи, которую мы упоминали выше.
+
+.. code-block:: xml
+
+   <field name="arch" type="xml">
+
+Тут вводится сама вьюха или как ее менять.
+
+.. code-block:: xml
+
+   <xpath expr="//field[@name='website']" position="after">
+       <field name="vk_url" widget="url" />
+   </xpath>
+
+Тут делается следующие операции:
+
+- найти элемент ``field`` к которого свойство ``name`` равен ``website``.
+- после этого элемента (``position=after``) вставить код ``<field name="vk_url" widget="url" />``
+
+Мы вставляем поле ``vk_url`` и с помощью ``widget=url`` сделали так, чтобы это поле отображалась как ссылка.
+Без ``widget=url`` это поле будет отображаться, как обычное текстовое поле.
+
+Готово.
+Теперь надо модуль установить.
+
+- заходим в основное меню - Apps
+- снимаем фильтр ``Apps``
+- вводим ``helloworld``
+- в появившемся мини-карточке нажимаем "Install".
+
+После того, как модуль установится, заходим в основное меню - Contacts, выбираем любой контакт и видим, что мы добавили это поле.
