@@ -243,8 +243,8 @@
    from odoo import fields, models
 
 
-   class ResParnter(models.Model):
-       _inherit = "res.parnter"
+   class ResPartner(models.Model):
+       _inherit = "res.partner"
 
        vk_url = fields.Char("VK URL")
 
