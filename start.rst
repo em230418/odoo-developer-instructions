@@ -229,7 +229,7 @@
    source venv/bin/activate
    cd vendor/odoo
    python3 -m pip install -r requirements.txt
-   python3 -m pip install .
+   python3 -m pip install -e .
 
 TODO: Прочее (надо раскидать)
 =============================
