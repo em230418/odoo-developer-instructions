@@ -72,99 +72,86 @@
 2. эти настройки сохранить
 
 В нашем случае не будет необходимости устанавливать python-пакеты.
-Перейдем каталог, где мы разворачивали Odoo и посмотрим в какой ветке мы находимся:
+Перейдем каталог для проектов под Odoo 14.0
+На основе шаблона создаем проект helloworld
 
 .. code-block:: sh
 
-   cd /opt/docker-odoo-14
-   git branch --show-current
+   cd /opt/odoo-projects/14.0/projects
 
-Предполагается, что на выходе будет 14.0.
-Если это не так, то надо сначала перейти в эту ветку:
+Создаем проект helloworld на основе шаблона:
 
 .. code-block:: sh
 
-   git checkout 14.0
-
-После чего мы из этой ветки создаем свою ветку.
-Допустим это будет 14.0-helloworld.
-
-.. code-block:: sh
-
-   git checkout -b 14.0-helloworld
-
-Тут должен появится вопрос, зачем мы другую ветку создаем?
-Ответ таков: мы создаем ветку, в котором будем хранить настройки для проекта.
-На практике предполагается, что для каждого клиента будем создавать отдельную ветку со своими настройками.
+   ./scaffold helloworld
 
 Дальше мы создаем каталог, в котором планируем размещать свои модули.
 
 .. code-block:: sh
 
-   mkdir vendor/me
+   cd helloworld
+   mkdir src
 
-Напомню, что слово vendor с английского переводится, как поставщик, а слово me - я.
-В данном конктесте подразумевается, в каталоге ``vendor/me`` будут храняться модули, у которых поставщиком являюсь я.
+Поясняем, что проект в техническом смысле состоит из двух частей:
 
-Далее надо указать название базы данных, где будет развернута Odoo, и пути каталогов с модулями.
-Для этого надо:
+1. среда на котором этот проект запускаться.
+   Запускаться проект будет в docker контейнерах, настройки контейнера указаны в ``docker-compose.yml``.
+   Образ контейнера задается с помощью файла ``Dockerfile``.
+   За основной образ берется образ, который разворачивали в предыдущей главе ``Настройка окружения для работы``
 
-1. в файле ``docker-compose.yml`` указать название БД и настроить соотвествие путей из основной системы в контейнер;
+2. собственно сами модули
 
-2. в файле ``config/odoo.conf`` настроить пути до модулей в рамках контейнера;
-
-В ``docker-compose.yml`` в качестве названия БД указываем ``helloworld_example`` и добавляем путь к модулям следующим образом:
-
-.. code-block:: diff
-
-    diff --git a/docker-compose.yml b/docker-compose.yml
-    index 940d1fb..629ba25 100644
-    --- a/docker-compose.yml
-    +++ b/docker-compose.yml
-    @@ -9,6 +9,7 @@ x-default:
-         - ./vendor/odoo/odoo:/usr/lib/python3/dist-packages/odoo
-         - ./vendor/odoo/addons:/mnt/addons/odoo
-         - ./config:/etc/odoo
-    +    - ./vendor/me:/mnt/addons/private
-
-       environment:
-         - WDB_SOCKET_SERVER=wdb
-    @@ -24,10 +25,10 @@ services:
-           - odoo-longpolling
-           - smtpfake
-         command: ['--dev', 'wdb,reload,qweb,werkzeug,xml',
-    -    '-d', 'example_database',
-    +    '-d', 'helloworld_database',
-         '-i', 'mail',
-         #'--test-enable',
-         #'--stop-after-init',
-         #'--log-handler=odoo.addons.partner_contact_birthdate:DEBUG',
-         ]
-
-В ``config/odoo.conf`` добавляем путь следующим образом:
+Теперь нам необходимо указать путь к нашим модулям.
+Редактируем odoo.conf следующим образом:
 
 .. code-block:: diff
 
-    diff --git a/config/odoo.conf b/config/odoo.conf
-    index b0bd3f1..dd72c46 100755
-    --- a/config/odoo.conf
-    +++ b/config/odoo.conf
-    @@ -1,5 +1,6 @@
-     [options]
-     addons_path =
-    +    /mnt/addons/private,
-         /mnt/addons/odoo
+   diff --git a/odoo.conf b/odoo.conf
+   index 11ac9d7..79c0c3f 100644
+   --- a/odoo.conf
+   +++ b/odoo.conf
+   @@ -1,5 +1,6 @@
+    [options]
+    addons_path =
+   +            /mnt/project/src,
+                /mnt/common/odoo/odoo/addons
+    data_dir = /var/lib/odoo
+    ; admin_passwd = admin
 
-     data_dir = /var/lib/odoo
+Поясняем, что внутри контейнера:
+
+- текущий каталог с проектом ``/opt/odoo-projects/14.0/projects/helloworld`` соотвествует каталогу ``/mnt/project``
+
+- каталог с клонированными репозиториями ``/opt/odoo-projects/14.0/common`` соотвестувет каталогу ``/mnt/common``
+
+Настройка проекта в PyCharm
+---------------------------
+
+В PyCharm нажимаем на New Project.
+Выставляем следующие опции:
+
+- Location /opt/odoo-projects/14.0/projects/helloworld
+- Python Interpreter: Previously configured interpreter
+- Create a main.py welcome script: галочку убираем
+
+Далее не торопимся нажимать на Create, а выбираем интерпретатор:
+
+- Нажимаем на кнопку "..." рядом с полем Interpreter
+- Во вкладке "Virtualenv Environment" нажимаем на кнопку "..." рядом с полем Interpreter
+- Выбираем /opt/odoo-projects/14.0/venv/bin/python
+- Проставляем галочку на "Make available to all projects"
+- Нажимаем OK.
+
+Вот теперь можно нажимать на Create
 
 Написание модуля (TODO: переделать название раздела)
 ----------------------------------------------------
 
-Перейдем в этот каталог:
+Перейдем в каталог, где будем писать модуль helloworld
 
 .. code-block:: sh
 
-   cd vendor/me
+   cd /opt/odoo-projects/14.0/projects/helloworld/src
 
 И с помощью шаблонизатора создадим свой модуль
 
@@ -262,7 +249,7 @@
 
 .. code-block:: sh
 
-   cd /opt/docker-odoo-14
+   cd /opt/odoo-projects/14.0/projects/helloworld
    docker-compose up odoo
 
 Поскольку мы в первый раз запускаем, то будет установка всех модулей с нуля.
@@ -274,7 +261,7 @@
    odoo_1              | 2021-04-26 11:33:55,581 1 INFO example_database odoo.modules.loading: 20 modules loaded in 34.69s, 10215 queries (+0 extra)
    odoo_1              | 2021-04-26 11:33:56,049 1 INFO example_database odoo.modules.loading: Modules loaded.
 
-Заходим в браузере http://odoo.localhost.
+Заходим в браузере http://odoo.localhost:14000
 Скорее всего будет перенаправление в страницу входа.
 В таком случае вводим admin:admin.
 
@@ -304,7 +291,7 @@
 
 ::
 
-   http://odoo.localhost/web?debug=1#id=14&action=133&model=res.partner&view_type=form&cids=&menu_id=95
+   http://odoo.localhost:14000/web?debug=1#id=14&action=133&model=res.partner&view_type=form&cids=&menu_id=95
 
 Обращаем внимание на перечисление параметров после знака "решетка" (``#``):
 
@@ -345,7 +332,7 @@
 
 .. code-block:: sh
 
-   cd /opt/docker-odoo-14/vendor/me/helloworld
+   cd /opt/odoo-projects/14.0/projects/helloworld/src/helloworld
 
 и с помощью шаблонизатора создаем файл, в котором будем описывать изменения
 

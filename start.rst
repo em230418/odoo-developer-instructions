@@ -185,34 +185,31 @@
 .. code-block:: sh
 
    cd /opt
-   git clone --single-branch -b 14.0 https://github.com/em230418/docker-odoo-template.git docker-odoo-14
-   cd docker-odoo-14
+   git clone https://github.com/em230418/odoo-work-environment.git odoo-projects
+   cd odoo-projects
+   ./init.sh 14.0
 
-Теперь необходимо скачать сам odoo.
+С помощью данного скрипта:
 
-.. code-block:: sh
+- загружаются odoo
+- загружаются прочие репозитории с модулями, которые могут понадобиться для дальнейшей работы
+- создаются docker образы, которые будем использовать для работы
 
-   cd vendor
-   git clone --single-branch -b 14.0 https://github.com/odoo/odoo.git --depth 1
+Данный скрипт будет работать довольно долго, потому-что будет скачивать odoo и необходимые файлы для создания образа.
 
-Структура каталога vendor
--------------------------
+Структура каталога odoo-projects
+--------------------------------
 
-В vendor будут находиться исходники odoo и модули от разных производителей, в том числе от нас самих.
+В каталоге odoo-project можно увидеть подкаталоги, которые соотвествуют версиями odoo.
+В структура каждого из подкаталогов идентична, поэтому для пример рассмотрим каталог ``/opt/odoo-projects/14.0``
 
-Для примера, нам нужно склонировать набор модулей из ``https://github.com/OCA/partner-contact``.
-Тогда предлагается его копию расположить по относительной пути ``vendor/OCA/partner-contact``.
+- ``common`` - каталог содержащий клонированные репозитории odoo и репозитории других модулей.
+Внутри ``common`` выглядит наподобии ``ORG_OR_USERNAME/REPOSITORY``, что соотвествует к примеру репозитория ``https://github.com/ORG_OR_USERNAME/REPOSITORY``.
 
-.. code-block:: sh
+- ``docker`` - каталог для создании docker образов, которые будут использоваться для работы
 
-   cd /opt/docker-odoo-14/vendor
-   mkdir OCA
-   cd OCA
-   git clone -b 14.0 --single-branch -o upstream https://github.com/OCA/partner-contact.git
-
-Данная схема расположения каталогов не обязательна для применения.
-Однако важно учесть, что со временем каталог vendor будет пополняться разными модулями,
-и соблюдение порядка поможет избежать ситуаций вида "куда я склонировал %MODULE_NAME%?".
+- ``projects`` - каталог для проектов.
+В качестве названия проекта практикуется использовать имя заказчика.
 
 Настройка виртуальных окружений
 -------------------------------
@@ -222,7 +219,7 @@
 
 .. code-block:: sh
 
-   cd /opt/docker-odoo-14
+   cd /opt/odoo-projects/14.0
    python3 -m venv venv --prompt odoo14
 
 Активируем это виртуальное окружение и устнавливаем odoo
