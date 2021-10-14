@@ -6,3 +6,4 @@
 
    start
    helloworld
+   project_structure
