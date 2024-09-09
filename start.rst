@@ -62,49 +62,15 @@
 4. Docker
 5. docker-compose
 
-Для установки первых трех выполните следующую команду:
+Для установки всех перечисленных выполните следующую команду:
 
 .. code-block:: sh
 
     sudo apt-get update
-    sudo apt-get install git python3 python3-venv
+    sudo apt-get install git python3 python3-venv docker.io docker-compose-v2
 
-Установка docker-compose
-------------------------
-
-..
-     Основано на https://docs.docker.com/compose/install/
-
-Для установки docker-compose выполните по-очередно следующие команды:
-
-.. code-block:: sh
-
-     sudo curl -L "https://github.com/docker/compose/releases/download/1.28.6/docker-compose-$(uname -s)-$(uname -m)" -o /opt/bin/docker-compose
-     sudo chmod +x /opt/bin/docker-compose
-
-Для проверки работоспособности убедитесь, что следующая команда выведет версию
-
-.. code-block:: sh
-
-     docker-compose --version
-
-Установка Docker
-----------------
-
-..
-    Основано на https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
-
-Для установки Docker выполните по-очередно следующие команды:
-
-.. code-block:: sh
-
-    sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo \
-    "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    sudo apt-get install docker-ce docker-ce-cli containerd.io
+Проверка установки Docker
+-------------------------
 
 Чтобы убедиться, что Docker успешно установлен и работает, выполните следующую команду:
 
@@ -129,32 +95,16 @@
 
    docker run hello-world
 
-Установка PyCharm
------------------
+Установка IDE
+-------------
 
-Если какое-либо приложение требует установки в обход метода ``sudo apt-get install``, то практикуется установка в данный каталог.
-Среди подобных приложения является PyCharm.
+Тут выбираем любой IDE на свой вкус.
 
-Переходим в данный каталог и уставливаем PyCharm:
+- PyCharm Community: https://www.jetbrains.com/help/pycharm/installation-guide.html
 
-.. code-block:: sh
+- Giga IDE: https://gigaide.ru/downloadlast/gigaideCE-241.15989.150.tar.gz
 
-   cd /opt
-   wget https://download-cf.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz -O pycharm-community.tar.gz
-   tar xvf pycharm-community.tar.gz
-   mv pycharm-community-2020.3.5 pycharm-ce
-   ln -s /opt/pycharm-ce/bin/pycharm.sh /opt/bin/pycharm
-
-
-Далее создаем символическую ссылку на рабочем столе (опционально):
-
-.. code-block:: sh
-
-   cd ~/Desktop
-   # каталог с рабочим столом может называться также "Рабочий стол"
-   # если команда выше не сработает, то выполните следующую команду
-   cd ~/Рабочий\ стол
-   ln -s /opt/bin/pycharm pycharm
+Для простоты будем считать, что мы установили PyCharm Community.
 
 Установка шаблонизатора
 -----------------------
@@ -187,7 +137,7 @@
    cd /opt
    git clone https://github.com/em230418/odoo-work-environment.git odoo-projects
    cd odoo-projects
-   ./init.sh 14.0
+   ./clone_odoo.sh 14.0
 
 С помощью данного скрипта:
 
